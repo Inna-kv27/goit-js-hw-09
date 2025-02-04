@@ -1,42 +1,54 @@
-// завдання 2 джс:
-// const STORAGE_KEY = 'feedback-msg';
-// const refs = {
-//   form: document.querySelector('.feedback-form'),
-// };
-// let arr = [];
-// refs.form.addEventListener('input', e => {
-//   const email = e.currentTarget.elements.email.value.trim();
-//   const message = e.currentTarget.elements.message.value.trim();
-//   const data = { email, message };
-//   saveToLS(STORAGE_KEY, data);
-// });
-// function initPage() {
-//   const formData = loadFromLS(STORAGE_KEY);
-//   refs.form.elements.email.value = formData?.email || '';
-//   refs.form.elements.message.value = formData?.message || '';
-// }
-// initPage();
-// refs.form.addEventListener('submit', e => {
-//   e.preventDefault();
-//   const email = e.currentTarget.elements.email.value.trim();
-//   const message = e.currentTarget.elements.message.value.trim();
-//   const data = { email, message };
-//   console.log(data);
-//   localStorage.removeItem(STORAGE_KEY);
-//   refs.form.reset();
-// });
-// function saveToLS(key, value) {
-//   const jsonData = JSON.stringify(value);
-//   localStorage.setItem(key, jsonData);
-// }
-// function loadFromLS(key) {
-//   const body = localStorage.getItem(key);
-//   try {
-//     const data = JSON.parse(body);
-//     return data;
-//   } catch {
-//     return body;
-//   }
-// }
+const STORAGE_KEY = 'feedback-form-state';
 
-// ===================  \\
+let formData = {
+  email: '',
+  message: '',
+};
+
+const form = document.querySelector('.feedback-form');
+const emailInput = form.querySelector("input[name='email']");
+const messageInput = form.querySelector("textarea[name='message']");
+
+const updateLocalStorage = () => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+};
+
+const loadFormData = () => {
+  try {
+    const savedData = localStorage.getItem(STORAGE_KEY);
+    formData = savedData ? JSON.parse(savedData) : { email: '', message: '' };
+
+    emailInput.value = formData.email || '';
+    messageInput.value = formData.message || '';
+  } catch (error) {
+    console.error('Error parsing localStorage data:', error);
+    formData = { email: '', message: '' }; // Якщо помилка — скидаємо об'єкт
+  }
+};
+
+form.addEventListener('input', event => {
+  const { name, value } = event.target;
+  formData[name] = value.trim();
+
+  if (formData[name] !== trimmedValue) {
+    formData[name] = trimmedValue;
+    updateLocalStorage();
+  }
+});
+
+form.addEventListener('submit', event => {
+  event.preventDefault();
+
+  if (!formData.email || !formData.message) {
+    alert('Fill please all fields');
+    return;
+  }
+
+  console.log(formData);
+
+  localStorage.removeItem(STORAGE_KEY);
+  formData = { email: '', message: '' };
+  form.reset();
+});
+
+loadFormData();
