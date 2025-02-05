@@ -16,13 +16,14 @@ const updateLocalStorage = () => {
 const loadFormData = () => {
   try {
     const savedData = localStorage.getItem(STORAGE_KEY);
-    formData = savedData ? JSON.parse(savedData) : { email: '', message: '' };
+    if (savedData) {
+      formData = JSON.parse(savedData);
 
-    emailInput.value = formData.email || '';
-    messageInput.value = formData.message || '';
+      emailInput.value = formData.email || '';
+      messageInput.value = formData.message || '';
+    }
   } catch (error) {
     console.error('Error parsing localStorage data:', error);
-    formData = { email: '', message: '' }; // Якщо помилка — скидаємо об'єкт
   }
 };
 
@@ -30,10 +31,7 @@ form.addEventListener('input', event => {
   const { name, value } = event.target;
   formData[name] = value.trim();
 
-  if (formData[name] !== trimmedValue) {
-    formData[name] = trimmedValue;
-    updateLocalStorage();
-  }
+  updateLocalStorage();
 });
 
 form.addEventListener('submit', event => {
